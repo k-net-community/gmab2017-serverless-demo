@@ -20,15 +20,13 @@ public async static Task Run(Stream myBlob, string name, TraceWriter log)
     if (result.adult.isAdultContent || result.adult.isRacyContent)
     {
         // Copy blob to the "rejected" container
-        StoreBlobWithMetadata(myBlob, "rejected", name, result, log);
+        StoreBlobWithMetadata(myBlob, "rejected", name, result, describeResult, log);
     }
     else
     {
         // Copy blob to the "accepted" container
-        StoreBlobWithMetadata(myBlob, "accepted", name, result, log);
+        StoreBlobWithMetadata(myBlob, "accepted", name, result, describeResult, log);
     }
-
-    log.Info("Image Description: " + describeResult.description.captions[0].text);
 }
 
 private async static Task<ImageAnalysisInfo> AnalyzeImageAsync(byte[] bytes, TraceWriter log)
@@ -64,7 +62,7 @@ private async static Task<ImageDescriptionInfo> DescribeImageAsync(byte[] bytes,
 }
 
 // Writes a blob to a specified container and stores metadata with it
-private static void StoreBlobWithMetadata(Stream image, string containerName, string blobName, ImageAnalysisInfo info, TraceWriter log)
+private static void StoreBlobWithMetadata(Stream image, string containerName, string blobName, ImageAnalysisInfo info, ImageDescriptionInfo desc, TraceWriter log)
 {
     log.Info($"Writing blob and metadata to {containerName} container...");
     
@@ -90,6 +88,7 @@ private static void StoreBlobWithMetadata(Stream image, string containerName, st
             blob.Metadata["adultScore"] = info.adult.adultScore.ToString("P0").Replace(" ",""); 
             blob.Metadata["isRacyContent"] = info.adult.isRacyContent.ToString(); 
             blob.Metadata["racyScore"] = info.adult.racyScore.ToString("P0").Replace(" ",""); 
+            blob.Metadata["description"] = desc.description.captions[0].text; 
             
 			// Save the blob metadata
             blob.SetMetadata();
