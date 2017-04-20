@@ -57,6 +57,8 @@ private async static Task<ImageDescriptionInfo> DescribeImageAsync(byte[] bytes,
     payload.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/octet-stream");
     
     var results = await client.PostAsync("https://southeastasia.api.cognitive.microsoft.com/vision/v1.0/describe", payload);
+    var resultString = await results.Content.ReadAsStringAsync();
+    log.Info("Describe Response: " + resultString);
     var result = await results.Content.ReadAsAsync<ImageDescriptionInfo>();
     return result;
 }
