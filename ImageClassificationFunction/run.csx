@@ -15,6 +15,8 @@ public async static Task Run(Stream myBlob, string name, TraceWriter log)
     log.Info("Is Racy: " + result.adult.isRacyContent.ToString());
     log.Info("Racy Score: " + result.adult.racyScore.ToString());
 
+    var describeResult = await DescribeImageAsync(array, log);
+
     if (result.adult.isAdultContent || result.adult.isRacyContent)
     {
         // Copy blob to the "rejected" container
@@ -25,6 +27,8 @@ public async static Task Run(Stream myBlob, string name, TraceWriter log)
         // Copy blob to the "accepted" container
         StoreBlobWithMetadata(myBlob, "accepted", name, result, log);
     }
+
+    log.Info("Image Description: " + describeResult.captions[0].text);
 }
 
 private async static Task<ImageAnalysisInfo> AnalyzeImageAsync(byte[] bytes, TraceWriter log)
@@ -38,6 +42,21 @@ private async static Task<ImageAnalysisInfo> AnalyzeImageAsync(byte[] bytes, Tra
     payload.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/octet-stream");
     
     var results = await client.PostAsync("https://southeastasia.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=Adult", payload);
+    var result = await results.Content.ReadAsAsync<ImageAnalysisInfo>();
+    return result;
+}
+
+private async static Task<ImageAnalysisInfo> DescribeImageAsync(byte[] bytes, TraceWriter log)
+{
+    HttpClient client = new HttpClient();
+
+    var key = ConfigurationManager.AppSettings["SubscriptionKey"].ToString();
+    client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", key);
+
+    HttpContent payload = new ByteArrayContent(bytes);
+    payload.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/octet-stream");
+    
+    var results = await client.PostAsync("https://southeastasia.api.cognitive.microsoft.com/vision/v1.0/describe", payload);
     var result = await results.Content.ReadAsAsync<ImageAnalysisInfo>();
     return result;
 }
