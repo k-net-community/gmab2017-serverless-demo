@@ -28,7 +28,7 @@ public async static Task Run(Stream myBlob, string name, TraceWriter log)
         StoreBlobWithMetadata(myBlob, "accepted", name, result, log);
     }
 
-    log.Info("Image Description: " + describeResult.captions[0].text);
+    log.Info("Image Description: " + describeResult.description.captions[0].text);
 }
 
 private async static Task<ImageAnalysisInfo> AnalyzeImageAsync(byte[] bytes, TraceWriter log)
@@ -127,12 +127,26 @@ public class Adult
 
 public class ImageDescriptionInfo
 {
-    public List<string> tags { get; set; }
-    public List<Caption> captions { get; set; }
+    public Description description { get; set; }
+    public string requestId { get; set; }
+    public Metadata metadata { get; set; }
+}
+
+public class Description
+{
+    public string[] tags { get; set; }
+    public Caption[] captions { get; set; }
 }
 
 public class Caption
 {
     public string text { get; set; }
-    public double confidence { get; set; }
+    public float confidence { get; set; }
+}
+
+public class Metadata
+{
+    public int width { get; set; }
+    public int height { get; set; }
+    public string format { get; set; }
 }
