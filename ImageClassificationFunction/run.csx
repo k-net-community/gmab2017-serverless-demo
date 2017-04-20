@@ -57,7 +57,7 @@ private async static Task<ImageAnalysisInfo> DescribeImageAsync(byte[] bytes, Tr
     payload.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/octet-stream");
     
     var results = await client.PostAsync("https://southeastasia.api.cognitive.microsoft.com/vision/v1.0/describe", payload);
-    var result = await results.Content.ReadAsAsync<ImageAnalysisInfo>();
+    var result = await results.Content.ReadAsAsync<ImageDescriptionInfo>();
     return result;
 }
 
@@ -121,4 +121,10 @@ public class Adult
     public bool isRacyContent { get; set; }
     public float adultScore { get; set; }
     public float racyScore { get; set; }
+}
+
+public class ImageDescriptionInfo
+{
+    public List<string> tags { get; set; }
+    public List<string> captions { get; set; }
 }
