@@ -5,7 +5,7 @@
       "name": "myBlob",
       "type": "blobTrigger",
       "direction": "in",
-      "path": "samples-workitems/{name}",
+      "path": "uploaded/{name}",
       "connection": ""
     }
   ]
