@@ -46,7 +46,7 @@ private async static Task<ImageAnalysisInfo> AnalyzeImageAsync(byte[] bytes, Tra
     return result;
 }
 
-private async static Task<ImageAnalysisInfo> DescribeImageAsync(byte[] bytes, TraceWriter log)
+private async static Task<ImageDescriptionInfo> DescribeImageAsync(byte[] bytes, TraceWriter log)
 {
     HttpClient client = new HttpClient();
 
@@ -126,5 +126,11 @@ public class Adult
 public class ImageDescriptionInfo
 {
     public List<string> tags { get; set; }
-    public List<string> captions { get; set; }
+    public List<Caption> captions { get; set; }
+}
+
+public class Caption
+{
+    public string text { get; set; }
+    public double confidence { get; set; }
 }
